@@ -957,7 +957,17 @@ function openDrawer(){document.getElementById('drawer').classList.add('open');do
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('scrim').classList.remove('show');}
 function openHelp(){document.getElementById('modal').classList.add('show');}
 function closeHelp(){document.getElementById('modal').classList.remove('show');}
-function toggleTheme(){var h=document.documentElement,d=h.getAttribute('data-theme')==='dark'?'light':'dark';h.setAttribute('data-theme',d);localStorage.setItem('ptec_theme',d);document.getElementById('themeBtn').textContent=d==='dark'?'☀️':'🌙';}
+function toggleTheme(){
+  var h=document.documentElement;
+  // Add temporary transition class for smooth theme switch
+  h.classList.add('theme-transition');
+  var d=h.getAttribute('data-theme')==='dark'?'light':'dark';
+  h.setAttribute('data-theme',d);
+  localStorage.setItem('ptec_theme',d);
+  document.getElementById('themeBtn').textContent=d==='dark'?'☀️':'🌙';
+  // Remove the class after transition ends to avoid affecting other interactions
+  setTimeout(function(){ h.classList.remove('theme-transition'); }, 500);
+}
 /* ===== OPTION A: Reset theme back to follow system ===== */
 function resetTheme(){
   localStorage.removeItem('ptec_theme');
@@ -1055,32 +1065,6 @@ function filesHTML(p){var key=(p.k?p.k+'|'+(p.g||'')+'|':'')+(p.kind?p.kind+'|'+
 function openFile(u){if(u==='#'){toast('ℹ️ Sample item — add Drive link in FILES.');}else{window.open(u,'_blank');}}
 function phoneGrid(q){q=(q||'').toLowerCase();var filtered=PHONES.filter(function(x){return x.n.toLowerCase().indexOf(q)>-1||x.p.toLowerCase().indexOf(q)>-1||x.ph.indexOf(q)>-1;});if(!filtered.length)return '<div class="card small" style="grid-column:1/-1">Not found.</div>';var cats={teacher:'Teachers',staff:'Staff',support:'Support'};var grouped={teacher:[],staff:[],support:[]};filtered.forEach(function(x){grouped[x.c].push(x);});var html='';Object.keys(grouped).forEach(function(cat){if(!grouped[cat].length)return;html+='<div style="grid-column:1/-1;margin-top:16px;margin-bottom:8px"><h3 style="margin:0;font-size:15px;color:var(--mut);font-weight:600">'+cats[cat]+' ('+grouped[cat].length+')</h3></div>';grouped[cat].forEach(function(x){html+='<div class="phone-card rv" onclick="window.open(\'tel:'+x.ph+'\')"><span class="phone-cat cat-'+x.c+'">'+cats[x.c]+'</span><div class="phone-name">'+x.n+'</div><div class="phone-pos">'+x.p+'</div><div class="phone-num">📞 '+x.ph+'</div></div>';});});return html;}
 function filterPhone(q){document.getElementById('phoneGrid').innerHTML=phoneGrid(q);}
-function sendChat(){var i=document.getElementById('gin'),q=i.value.trim();if(!q)return;i.value='';var ch=document.getElementById('chat');ch.innerHTML+='<div class="bub me">'+esc(q)+'</div>';ch.scrollTop=ch.scrollHeight;ch.innerHTML+='<div class="bub bot" id="typingBub"><div class="typing"><span></span><span></span><span></span></div></div>';ch.scrollTop=ch.scrollHeight;var low=q.toLowerCase(),hit=TEXKB.find(function(e){return e.k.some(function(k){return low.indexOf(k)>-1;});});var a=hit?hit.a:'Sorry! Small offline bot 🤖';setTimeout(function(){var tb=document.getElementById('typingBub');if(tb){tb.outerHTML='<div class="bub bot">'+a+'</div>';}ch.scrollTop=ch.scrollHeight;},800);}
-function addCnt(n){cnt=Math.max(0,cnt+n);var e=document.getElementById('cnt');if(e)e.textContent=cnt;}
-function resetCnt(){cnt=0;var e=document.getElementById('cnt');if(e)e.textContent=0;}
-function convNe(){var v=parseFloat(document.getElementById('ne').value);document.getElementById('tex').value=v>0?(590.5/v).toFixed(2):'';}
-function convTex(){var v=parseFloat(document.getElementById('tex').value);document.getElementById('ne').value=v>0?(590.5/v).toFixed(2):'';}
-function nextJoke(){ji=(ji+1)%JOKES.length;document.getElementById('jokeCard').innerHTML=JOKES[ji];}
-function globalSearch(q){q=(q||'').toLowerCase().trim();var r=document.getElementById('gsResults');if(!q){r.innerHTML='<div class="card small">Start typing to search...</div>';return;}var res=[];TERMS.forEach(function(t){if(t[1].toLowerCase().indexOf(q)>-1)res.push({t:'📘 '+t[1],a:'show(\'notes\')',k:'Term'});});Object.keys(NOTES).forEach(function(k){Object.keys(NOTES[k]).forEach(function(g){(NOTES[k][g]||[]).forEach(function(s){if(s.toLowerCase().indexOf(q)>-1)res.push({t:'📁 '+s+' ('+TERMS.find(function(x){return x[0]===k;})[1]+', '+GROUPS[g]+')',a:'show(\'files\',{k:\''+k+'\',g:\''+g+'\',s:\''+s+'\'})',k:'Subject'});});});});PHONES.forEach(function(x){if(x.n.toLowerCase().indexOf(q)>-1||x.p.toLowerCase().indexOf(q)>-1)res.push({t:'👤 '+x.n+' — '+x.p,a:'show(\'phone\')',k:'Person'});});if(!res.length){r.innerHTML='<div class="card small">No results found.</div>';return;}r.innerHTML='<div class="list">'+res.slice(0,20).map(function(x){return '<div class="row" onclick="'+x.a+'"><span class="fic">'+({Term:'📘',Subject:'📁',Person:'👤'}[x.k]||'🔍')+'</span><span class="rname">'+x.t+'</span><span>›</span></div>';}).join('')+'</div>';}
-document.getElementById('drawerItems').innerHTML=[['goHome()','🏠 Home'],['show(\'notes\')','📘 Notes'],['show(\'search\')','🔍 Search'],['show(\'levels\',{kind:\'reports\'})','📋 Lab Reports'],['show(\'levels\',{kind:\'qbank\'})','🗂️ Q-Bank'],['show(\'syllabus\')','📖 Syllabus'],['show(\'list\',{kind:\'notice\'})','📢 Notice'],['show(\'list\',{kind:\'routine\'})','🗓️ Routine'],['show(\'list\',{kind:\'result\'})','📊 Result'],['show(\'info\',{page:\'library\'})','🏛️ Library'],['show(\'info\',{page:\'courses\'})','🎁 Free Courses'],['show(\'texgpt\')','🤖 Tex-GPT'],['show(\'submit\')','📤 Submit Notes'],['show(\'phone\')','☎️ Phone Book'],['show(\'koto\')','🧶 Count Koto'],['show(\'jokes\')','😄 Jokes'],['show(\'games\')','🎮 Games'],['resetTheme()','🔄 System Theme']].map(function(x){return '<div class="ditem" onclick="closeDrawer();'+x[0]+'">'+x[1]+'</div>';}).join('');
-/* ===== SMART THEME: respects system preference + remembers user choice ===== */
-var savedTheme = localStorage.getItem('ptec_theme');
-var systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-var initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
-document.documentElement.setAttribute('data-theme', initialTheme);
-document.getElementById('themeBtn').textContent = initialTheme === 'dark' ? '☀️' : '🌙';
-// Auto-update theme if user changes their device theme (only if they haven't manually chosen)
-if (window.matchMedia) {
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-        if (!localStorage.getItem('ptec_theme')) {
-            var newTheme = e.matches ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            document.getElementById('themeBtn').textContent = newTheme === 'dark' ? '☀️' : '🌙';
-        }
-    });
-}
-buildNotif();paint();
-window.addEventListener('load',function(){setTimeout(function(){document.getElementById('splash').classList.add('hide');},900);});
-</script>
+function sendChat(){var i=document.getElementById('gin'),q=i.value.trim();if(!q)return;i.value='';var ch=document.getElementById('chat');ch.innerHTML+='<div class="bub me">'+esc(q)+'</div>';ch.scrollTop=ch.scrollHeight;ch.innerHTML+='<div class="bub bot" id="typingBub"><div class="typing"><span></span><span></span><span></span></div></div>';ch.scrollTop=ch.scrollHeight;var low=q.toLowerCase(),hit=TEXKB.find(function(e){return e.k.some(function(k){return low.indexOf(k)>-1;});});var a=hit?hit.a:'Sorry! Small offline bot 🤖';
 </body>
 </html>
