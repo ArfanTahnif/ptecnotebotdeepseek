@@ -957,17 +957,7 @@ function openDrawer(){document.getElementById('drawer').classList.add('open');do
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('scrim').classList.remove('show');}
 function openHelp(){document.getElementById('modal').classList.add('show');}
 function closeHelp(){document.getElementById('modal').classList.remove('show');}
-function toggleTheme(){
-  var h=document.documentElement;
-  // Add temporary transition class for smooth theme switch
-  h.classList.add('theme-transition');
-  var d=h.getAttribute('data-theme')==='dark'?'light':'dark';
-  h.setAttribute('data-theme',d);
-  localStorage.setItem('ptec_theme',d);
-  document.getElementById('themeBtn').textContent=d==='dark'?'☀️':'🌙';
-  // Remove the class after transition ends to avoid affecting other interactions
-  setTimeout(function(){ h.classList.remove('theme-transition'); }, 500);
-}
+function toggleTheme(){var h=document.documentElement,d=h.getAttribute('data-theme')==='dark'?'light':'dark';h.setAttribute('data-theme',d);localStorage.setItem('ptec_theme',d);document.getElementById('themeBtn').textContent=d==='dark'?'☀️':'🌙';}
 /* ===== OPTION A: Reset theme back to follow system ===== */
 function resetTheme(){
   localStorage.removeItem('ptec_theme');
